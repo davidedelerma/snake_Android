@@ -1,6 +1,7 @@
 package com.example.user.snakegame;
 
 import android.graphics.RectF;
+import android.util.Log;
 
 /**
  * Created by user on 21/08/2016.
@@ -19,9 +20,15 @@ public class Snake {
     public final int RIGHT = 2;
     //add up and down
     private int snakeMoving = STOPPED;
+    int screenX;
+    int screenY;
+
+
     public Snake(int screenX, int screenY){
-        length = 130;
+        length = 20;
         height = 20;
+        this.screenX = screenX;
+        this.screenY = screenY;
         // Start snake in roughly the sceen centre
         x = screenX / 2;
         y = screenY / 2;
@@ -39,26 +46,25 @@ public class Snake {
     }
 
     public void update(long fps){
-        if (checkWallCollision() == true){
-            if(snakeMoving == LEFT){
-                x = x - snakeSpeed / fps;
-            }
-
-            if(snakeMoving == RIGHT){
-                x = x + snakeSpeed / fps;
-            }
-
-            rect.left = x;
-            rect.right = x + length;
+        if(snakeMoving == LEFT){
+            x = x - snakeSpeed / fps;
         }
+
+        if(snakeMoving == RIGHT){
+            x = x + snakeSpeed / fps;
+        }
+
+        rect.left = x;
+        rect.right = x + length;
+
+        String rectright = Float.toString(rect.right);
+        String rectleft = Float.toString(rect.left);
+        String stringx = Integer.toString(this.screenX);
+        Log.d("rect right + +rect left + screen X", rectright+" "+rectleft+" "+stringx);
+
+
+
     }
 
-    //doesn't work
-    public boolean checkWallCollision(){
-        //just for left and right
-        if (rect.left == 0){
-            return false;
-        }
-        return true;
-    }
+
 }

@@ -29,6 +29,8 @@ public class GameView extends SurfaceView implements Runnable{
     Snake snake;
     int screenX;
     int screenY;
+    GameRules gameRules;
+    Board board;
 
     public GameView (Context context, int screenX, int screenY){
         super(context);
@@ -36,9 +38,11 @@ public class GameView extends SurfaceView implements Runnable{
         this.screenY = screenY;
         ourHolder = getHolder();
         paint = new Paint();
+        board = new Board(20, this.screenY-20, this.screenX-20, 20);
         bitmapBob = BitmapFactory.decodeResource(this.getResources(), R.drawable.bob);
         snake = new Snake(this.screenX ,this.screenY);
         snake.update(fps);
+        gameRules = new GameRules();
     }
 
     @Override// why I should override from an interface?
@@ -56,7 +60,9 @@ public class GameView extends SurfaceView implements Runnable{
     }
 
     public void update(){
-        snake.update(fps);
+        if (gameRules.checkWallCollision(snake)) {
+            snake.update(fps);
+        }
         if (isMoving){
             bobXPosition = bobXPosition + (walkSpeedPerSecond/fps);
         }
@@ -65,9 +71,10 @@ public class GameView extends SurfaceView implements Runnable{
     public void draw(){
         if (ourHolder.getSurface().isValid()){
             canvas = ourHolder.lockCanvas();
-            canvas.drawARGB(255, 26, 128, 182);
-            paint.setColor(Color.argb(255, 255, 255, 255));
+            canvas.drawARGB(255, 255, 255, 255);
+            paint.setColor(Color.argb(255, 255, 0, 255));
             canvas.drawRect(snake.getRect(), paint);
+            canvas.drawRect(board.getRectF(),board.getPaint());
             // Make the text a bit bigger
             paint.setTextSize(45);
             // Display the current fps on the screen
