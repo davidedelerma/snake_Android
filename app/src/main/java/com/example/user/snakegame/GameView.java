@@ -1,11 +1,12 @@
 package com.example.user.snakegame;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -15,22 +16,20 @@ import android.view.SurfaceView;
  * Created by user on 20/08/2016.
  */
 public class GameView extends SurfaceView implements Runnable{
+
     Thread gameThread = null;
     SurfaceHolder ourHolder;
     volatile boolean playing;
-    Canvas canvas;
-    Paint paint;
     long fps;
     private long timeThisFrame;
-    Bitmap bitmapBob;
-    boolean isMoving = false;
-    float walkSpeedPerSecond = 150;
-    float bobXPosition= 10;
-    Snake snake;
-    int screenX;
-    int screenY;
+    int screenX, screenY;
+    Canvas canvas;
+    Paint paint;
     GameRules gameRules;
     Board board;
+    Snake snake;
+    Fruit fruit;
+
 
     public GameView (Context context, int screenX, int screenY){
         super(context);
@@ -38,11 +37,11 @@ public class GameView extends SurfaceView implements Runnable{
         this.screenY = screenY;
         ourHolder = getHolder();
         paint = new Paint();
-        board = new Board(20, this.screenY-20, this.screenX-20, 20);
-        bitmapBob = BitmapFactory.decodeResource(this.getResources(), R.drawable.bob);
-        snake = new Snake(this.screenX ,this.screenY);
-        snake.update(fps);
-        gameRules = new GameRules();
+        board = new Board(20, 20, this.screenX-20, this.screenY - 200);
+        fruit = new Fruit(board.getRect().bottom-15, board.getRect().top+15, board.getRect().right-15, board.getRect().left+15);
+        snake = new Snake(board.getRect().centerX(), board.getRect().centerY());
+        snake.update();
+        gameRules = new GameRules(snake);
     }
 
     @Override// why I should override from an interface?
@@ -60,11 +59,18 @@ public class GameView extends SurfaceView implements Runnable{
     }
 
     public void update(){
-        if (gameRules.checkWallCollision(snake)) {
-            snake.update(fps);
+        if (gameRules.checkWallCollision(board)) {
+            snake.update();
         }
-        if (isMoving){
-            bobXPosition = bobXPosition + (walkSpeedPerSecond/fps);
+        else
+        {
+            if (ourHolder.getSurface().isValid()) {
+                playing = false;
+            }
+//            Context myContext = this.getContext();
+//            Intent newintent = new Intent();
+//            newintent.setClass(myContext,GameOverActivity.class);
+//            myContext.startActivity(newintent);
         }
     }
 
@@ -73,16 +79,12 @@ public class GameView extends SurfaceView implements Runnable{
             canvas = ourHolder.lockCanvas();
             canvas.drawARGB(255, 255, 255, 255);
             paint.setColor(Color.argb(255, 255, 0, 255));
-            canvas.drawRect(snake.getRect(), paint);
-            canvas.drawRect(board.getRectF(),board.getPaint());
-            // Make the text a bit bigger
+            canvas.drawRect(board.getRect(), board.getPaint());
+            snake.draw(canvas);
+            fruit.draw(canvas);
             paint.setTextSize(45);
-            // Display the current fps on the screen
             canvas.drawText("FPS:" + fps, 20, 40, paint);
-            // Draw bob at bobXPosition, 200 pixels
-            canvas.drawBitmap(bitmapBob, bobXPosition, 200, paint);
-            // Draw everything to the screen
-            // and unlock the drawing surface
+            if (!playing){canvas.drawText("GAME OVER", 20, screenY-40, paint);};
             ourHolder.unlockCanvasAndPost(canvas);
         }
     }
@@ -106,19 +108,25 @@ public class GameView extends SurfaceView implements Runnable{
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent){
-        switch (motionEvent.getAction() & MotionEvent.ACTION_MASK){
+        switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                isMoving = true;
-                if(motionEvent.getX() > screenX / 2){
-                    snake.setMovementState(snake.RIGHT);
+                RectF head = snake.getSnakeBody().getLast();
+                //if motion up or down
+                if (snake.getMovementSate() == snake.UP || snake.getMovementSate() == snake.DOWN) {
+
+                    if (motionEvent.getX() > head.centerX()) {
+                        snake.setMovementState(snake.RIGHT);
+                    } else if (motionEvent.getX() < head.centerX()) {
+                        snake.setMovementState(snake.LEFT);
+                    }
+                } else if (snake.getMovementSate() == snake.LEFT || snake.getMovementSate() == snake.RIGHT) {
+
+                    if (motionEvent.getY() < head.centerY()){
+                        snake.setMovementState(snake.DOWN);
+                     } else if (motionEvent.getY() > head.centerY()){
+                        snake.setMovementState(snake.UP);
+                    }
                 }
-                else{
-                    snake.setMovementState(snake.LEFT);
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                isMoving = false;
-                snake.setMovementState(snake.STOPPED);
                 break;
 
         }

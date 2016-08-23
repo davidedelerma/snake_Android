@@ -14,13 +14,8 @@ public class SnakeMain extends AppCompatActivity {
     GameView gameView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //the on create method is called when the app starts
         super.onCreate(savedInstanceState);
-        //to turn off the title
-        //requestWindowFeature(Window.FEATURE_NO_TITLE);
-        // Get a Display object to access screen details
         Display display = getWindowManager().getDefaultDisplay();
-        // Load the resolution into a Point object
         Point size = new Point();
         display.getSize(size);
         int screenX = size.x;
@@ -32,7 +27,6 @@ public class SnakeMain extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
         // Tell the gameView resume method to execute
         gameView.resume();
     }
@@ -41,7 +35,6 @@ public class SnakeMain extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
         // Tell the gameView pause method to execute
         gameView.pause();
     }
