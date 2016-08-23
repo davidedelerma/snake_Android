@@ -37,9 +37,9 @@ public class GameView extends SurfaceView implements Runnable{
         this.screenY = screenY;
         ourHolder = getHolder();
         paint = new Paint();
-        board = new Board(20, 20, this.screenX-20, this.screenY - 200);
-        fruit = new Fruit(board.getRect().bottom-15, board.getRect().top+15, board.getRect().right-15, board.getRect().left+15);
-        snake = new Snake(board.getRect().centerX(), board.getRect().centerY());
+        board = new Board(20, 20, 620, 620);
+        fruit = new Fruit(board.getRect(), 20);
+        snake = new Snake(40, 40);
         snake.update();
         //gameRules = new GameRules(snake);
     }
@@ -60,9 +60,14 @@ public class GameView extends SurfaceView implements Runnable{
     }
 
     public void update(){
-       // boolean check = gameRules.checkFruitCollision(board,fruit);
-        if (gameRules.checkWallCollision(board) && gameRules.checkFruitCollision(board,fruit)) {
+        if (gameRules.checkWallCollision(board) && !gameRules.checkFruitCollision(board,fruit)) {
             snake.update();
+        }
+        else if (gameRules.checkWallCollision(board) && gameRules.checkFruitCollision(board,fruit))
+        {
+
+            snake.grow();
+            fruit = new Fruit(board.getRect(), 20);
         }
         else
         {

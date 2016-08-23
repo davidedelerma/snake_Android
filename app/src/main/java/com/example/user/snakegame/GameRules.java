@@ -31,16 +31,17 @@ public class GameRules {
 
     public boolean checkFruitCollision(Board board, Fruit fruit){
         head = this.body.getLast();
-        float headRight = head.right;
-        float headLeft = head.left;
-        float headtop = head.top;
-        float feadBottom = head.bottom;
-        int fruitx = fruit.getX();
-        int fruitY = fruit.getY();
+        //SAT (Separhating Axses Theorem) theorem
+        float distX = Math.abs(head.centerX() - (float) fruit.getFoodObj().centerX());
+        float halfWidthX = (head.width())/2 + (float) fruit.getFoodObj().width()/2;
+        float distY = Math.abs(head.centerY() - (float) fruit.getFoodObj().centerY());
+        float halfWidthY = Math.abs(head.height()/2 + (float) fruit.getFoodObj().height()/2);
 
-        if (head.left <= fruit.getX() && head.right >= fruit.getX() &&
-                head.top >= fruit.getY() && head.bottom <= fruit.getY()){
-           return false;
-        } else {return true;}
+        if(distX < halfWidthX && distY < halfWidthY )
+        {
+            // collision
+           return true;
+        }
+        else {return false;}
     }
 }
