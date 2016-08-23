@@ -29,10 +29,12 @@ public class GameRules {
 
     }
 
-//    public boolean checkFruitCollision(Board board){
-//        head = this.body.getLast();
-//        if (){
-//           return false;
-//        } else {return true;}
-//    }
+    public boolean checkFruitCollision(Board board, Fruit fruit){
+        head = this.body.getLast();
+
+        if (head.left <= fruit.getX() && head.right >= fruit.getX() &&
+                head.top <= fruit.getY() && head.bottom >= fruit.getY()){
+           return false;
+        } else {return true;}
+    }
 }
