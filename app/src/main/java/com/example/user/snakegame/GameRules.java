@@ -31,9 +31,15 @@ public class GameRules {
 
     public boolean checkFruitCollision(Board board, Fruit fruit){
         head = this.body.getLast();
+        float headRight = head.right;
+        float headLeft = head.left;
+        float headtop = head.top;
+        float feadBottom = head.bottom;
+        int fruitx = fruit.getX();
+        int fruitY = fruit.getY();
 
         if (head.left <= fruit.getX() && head.right >= fruit.getX() &&
-                head.top <= fruit.getY() && head.bottom >= fruit.getY()){
+                head.top >= fruit.getY() && head.bottom <= fruit.getY()){
            return false;
         } else {return true;}
     }

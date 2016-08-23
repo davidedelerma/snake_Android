@@ -41,12 +41,13 @@ public class GameView extends SurfaceView implements Runnable{
         fruit = new Fruit(board.getRect().bottom-15, board.getRect().top+15, board.getRect().right-15, board.getRect().left+15);
         snake = new Snake(board.getRect().centerX(), board.getRect().centerY());
         snake.update();
-        gameRules = new GameRules(snake);
+        //gameRules = new GameRules(snake);
     }
 
     @Override// why I should override from an interface?
     public void run(){
         while(playing){
+            gameRules = new GameRules(snake);
             long startFrameTime = System.currentTimeMillis();
             update();
             draw();
@@ -59,7 +60,8 @@ public class GameView extends SurfaceView implements Runnable{
     }
 
     public void update(){
-        if (gameRules.checkWallCollision(board)) {
+       // boolean check = gameRules.checkFruitCollision(board,fruit);
+        if (gameRules.checkWallCollision(board) && gameRules.checkFruitCollision(board,fruit)) {
             snake.update();
         }
         else
