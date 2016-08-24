@@ -101,7 +101,7 @@ public class Snake {
     public void grow(){
        // long elapsed = (System.nanoTime() - this.timeSinceUpdate) / 1000000;
        // if (elapsed > snakeSpeed) {
-        snakeSpeed -= snakeSpeed * (20/100);
+        snakeSpeed -= 30;// snakeSpeed * (20/100);
         switch (snakeMoving){
             case RIGHT:
                 this.X += this.DX;
