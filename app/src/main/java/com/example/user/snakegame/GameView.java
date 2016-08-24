@@ -82,22 +82,7 @@ public class GameView extends SurfaceView implements Runnable{
         SharedPreferences prefs = context.getSharedPreferences("myPrefsKey", Context.MODE_PRIVATE);
         return prefs.getInt("key",0);
     }
-//    private static final String PREF_SAVEDTEXT = "savedText";
 
-
-//    public static void setStoredText(Context context, String text){
-//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        //create the key value pair
-//        editor.putString(PREF_SAVEDTEXT,text);
-//        editor.apply();
-//    }
-//
-//    public static String getStoredText(Context context){
-//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-//        String text = sharedPreferences.getString(PREF_SAVEDTEXT,null);
-//        return text;
-//    }
 
     public void refreshGame(){
         Context myContext = this.getContext();
@@ -144,8 +129,11 @@ public class GameView extends SurfaceView implements Runnable{
             button.draw(canvas);
             play.draw(canvas);
             paint.setTextSize(50);
-            canvas.drawLine(board.getRect().left, board.getRect().centerY(), board.getRect().right, board.getRect().centerY(), paint);
-            canvas.drawLine(board.getRect().centerX(), board.getRect().top, board.getRect().centerX(), board.getRect().bottom, paint);
+            if (snake.getMovementSate() == snake.UP || snake.getMovementSate() == snake.DOWN){
+                canvas.drawLine(board.getRect().centerX(), board.getRect().top, board.getRect().centerX(), board.getRect().bottom, paint);
+            } else if (snake.getMovementSate() == snake.LEFT || snake.getMovementSate() == snake.RIGHT){
+                canvas.drawLine(board.getRect().left, board.getRect().centerY(), board.getRect().right, board.getRect().centerY(), paint);
+            }
             canvas.drawText("Score:" + Integer.toString(user.getScore()), 20, board.getRect().bottom + 60, paint);
             canvas.drawText("Record:"+Integer.toString(record), 20, board.getRect().bottom+110, paint);
             if (!playing){canvas.drawText("GAME OVER", board.getRect().centerX()-150, board.getRect().centerY(), paint);};
