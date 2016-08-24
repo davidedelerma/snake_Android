@@ -3,11 +3,13 @@ package com.example.user.snakegame;
 import android.content.Context;
 import android.content.Intent;
 
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -21,7 +23,7 @@ public class GameView extends SurfaceView implements Runnable{
     Thread gameThread = null;
     SurfaceHolder ourHolder;
     volatile boolean playing;
-    int screenX, screenY, previouState;
+    int screenX, screenY, previouState, record;
     Canvas canvas;
     Paint paint;
     GameRules gameRules;
@@ -31,14 +33,17 @@ public class GameView extends SurfaceView implements Runnable{
     User user;
     Button button;
     PlayButton play;
+    Context context;
 
 
     public GameView (Context context, int screenX, int screenY){
         super(context);
+        this.context = context;
         Resources res = getResources();
         this.screenX = screenX;
         this.screenY = screenY;
         ourHolder = getHolder();
+        this.record = getRecord();
         user = new User();
         paint = new Paint();
         //for bigger devices
@@ -52,8 +57,6 @@ public class GameView extends SurfaceView implements Runnable{
         fruit = new Fruit(board.getRect(), 40);
         snake = new Snake(40, 40, 40);
         snake.update();
-        this.previouState = previouState;
-        //gameRules = new GameRules(snake);
     }
 
     @Override// why I should override from an interface?
@@ -64,6 +67,37 @@ public class GameView extends SurfaceView implements Runnable{
             draw();
         }
     }
+
+    public void saveRecord( int score){
+        SharedPreferences prefs = context.getSharedPreferences("myPrefsKey", Context.MODE_PRIVATE);
+        int oldScore = prefs.getInt("key", 0);
+        if( score > oldScore ){
+            SharedPreferences.Editor edit = prefs.edit();
+            edit.putInt("key", score);
+            edit.commit();
+        }
+    }
+
+    public int getRecord(){
+        SharedPreferences prefs = context.getSharedPreferences("myPrefsKey", Context.MODE_PRIVATE);
+        return prefs.getInt("key",0);
+    }
+//    private static final String PREF_SAVEDTEXT = "savedText";
+
+
+//    public static void setStoredText(Context context, String text){
+//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        //create the key value pair
+//        editor.putString(PREF_SAVEDTEXT,text);
+//        editor.apply();
+//    }
+//
+//    public static String getStoredText(Context context){
+//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+//        String text = sharedPreferences.getString(PREF_SAVEDTEXT,null);
+//        return text;
+//    }
 
     public void refreshGame(){
         Context myContext = this.getContext();
@@ -91,6 +125,8 @@ public class GameView extends SurfaceView implements Runnable{
         else
         {
             if (ourHolder.getSurface().isValid()) {
+                user.setRecord(user.getScore());
+                saveRecord(user.getRecord());
                 playing = false;
             }
 //
@@ -108,7 +144,8 @@ public class GameView extends SurfaceView implements Runnable{
             button.draw(canvas);
             play.draw(canvas);
             paint.setTextSize(50);
-            canvas.drawText("score:"+Integer.toString(user.getScore()), 20, board.getRect().bottom+60, paint);
+            canvas.drawText("Score:" + Integer.toString(user.getScore()), 20, board.getRect().bottom + 60, paint);
+            canvas.drawText("Record:"+Integer.toString(record), 20, board.getRect().bottom+110, paint);
             if (!playing){canvas.drawText("GAME OVER", board.getRect().centerX()-150, board.getRect().centerY(), paint);};
             ourHolder.unlockCanvasAndPost(canvas);
         }

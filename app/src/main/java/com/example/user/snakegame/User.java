@@ -19,4 +19,12 @@ public class User {
         return score;
     }
 
+    public void setRecord(int points){
+        record = points;
+    }
+
+    public int getRecord(){
+        return record;
+    }
+
 }
