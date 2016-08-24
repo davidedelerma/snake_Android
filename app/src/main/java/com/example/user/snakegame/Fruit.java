@@ -19,7 +19,7 @@ public class Fruit {
     int width, drawWidth;
 
     public Fruit(Rect rect, int width){
-        this.width = width;
+        this.width = width/2;
         this.rect = rect;
         this.drawWidth = this.width-2;
         this.minX = this.rect.left + this.width;

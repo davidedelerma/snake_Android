@@ -3,6 +3,7 @@ package com.example.user.snakegame;
 import android.content.Context;
 import android.content.Intent;
 
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -20,27 +21,33 @@ public class GameView extends SurfaceView implements Runnable{
     Thread gameThread = null;
     SurfaceHolder ourHolder;
     volatile boolean playing;
-    long fps;
-    private long timeThisFrame;
-    int screenX, screenY;
+    int screenX, screenY, previouState;
     Canvas canvas;
     Paint paint;
     GameRules gameRules;
     Board board;
     Snake snake;
     Fruit fruit;
+    User user;
+    Button button;
 
 
     public GameView (Context context, int screenX, int screenY){
         super(context);
+        Resources res = getResources();
         this.screenX = screenX;
         this.screenY = screenY;
         ourHolder = getHolder();
+        user = new User();
         paint = new Paint();
-        board = new Board(20, 20, 620, 620);
-        fruit = new Fruit(board.getRect(), 20);
-        snake = new Snake(40, 40);
+        //for bigger devices
+        //if (screenX > 750 && screenY > 800)
+        board = new Board(20, 20, 780, 820);
+        button = new Button(res, board.getRect().right-120,board.getRect().bottom+20);
+        fruit = new Fruit(board.getRect(), 40);
+        snake = new Snake(40, 40, 40);
         snake.update();
+        this.previouState = previouState;
         //gameRules = new GameRules(snake);
     }
 
@@ -48,26 +55,25 @@ public class GameView extends SurfaceView implements Runnable{
     public void run(){
         while(playing){
             gameRules = new GameRules(snake);
-            long startFrameTime = System.currentTimeMillis();
             update();
             draw();
-            timeThisFrame = System.currentTimeMillis()-startFrameTime;
-            if (timeThisFrame > 0)
-            {
-                fps = 1000/timeThisFrame;
-            }
         }
     }
 
     public void update(){
-        if (gameRules.checkWallCollision(board) && !gameRules.checkFruitCollision(board,fruit)) {
+        if (gameRules.checkWallCollision(board)
+                && !gameRules.checkCollisionWithItself()
+                && !gameRules.checkFruitCollision(board,fruit)) {
             snake.update();
         }
-        else if (gameRules.checkWallCollision(board) && gameRules.checkFruitCollision(board,fruit))
+        else if (gameRules.checkWallCollision(board)
+                && !gameRules.checkCollisionWithItself()
+                && gameRules.checkFruitCollision(board,fruit))
         {
 
             snake.grow();
-            fruit = new Fruit(board.getRect(), 20);
+            fruit = new Fruit(board.getRect(), 40);
+            user.updateScore();
         }
         else
         {
@@ -89,9 +95,10 @@ public class GameView extends SurfaceView implements Runnable{
             canvas.drawRect(board.getRect(), board.getPaint());
             snake.draw(canvas);
             fruit.draw(canvas);
-            paint.setTextSize(45);
-            canvas.drawText("FPS:" + fps, 20, 40, paint);
-            if (!playing){canvas.drawText("GAME OVER", 20, screenY-40, paint);};
+            button.draw(canvas);
+            paint.setTextSize(50);
+            canvas.drawText("score:"+Integer.toString(user.getScore()), 20, board.getRect().bottom+40, paint);
+            if (!playing){canvas.drawText("GAME OVER", board.getRect().centerX()-150, board.getRect().centerY(), paint);};
             ourHolder.unlockCanvasAndPost(canvas);
         }
     }
@@ -118,19 +125,32 @@ public class GameView extends SurfaceView implements Runnable{
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 RectF head = snake.getSnakeBody().getLast();
-                //if motion up or down
+                if (button.getRect().contains((int) motionEvent.getX(),(int) motionEvent.getY())){
+                    if(snake.getMovementSate() != snake.STOPPED){
+                        previouState = snake.getMovementSate();
+                        snake.setMovementState(snake.STOPPED);
+                    } else {
+                        snake.setMovementState(previouState);
+                    }
+
+                }
+
                 if (snake.getMovementSate() == snake.UP || snake.getMovementSate() == snake.DOWN) {
 
-                    if (motionEvent.getX() > head.centerX()) {
+                    if (motionEvent.getX() > head.centerX()
+                            && board.getRect().contains((int) motionEvent.getX(), (int) motionEvent.getY() ) ) {
                         snake.setMovementState(snake.RIGHT);
-                    } else if (motionEvent.getX() < head.centerX()) {
+                    } else if (motionEvent.getX() < head.centerX()
+                            && board.getRect().contains( (int) motionEvent.getX(),(int) motionEvent.getY() ) ) {
                         snake.setMovementState(snake.LEFT);
                     }
                 } else if (snake.getMovementSate() == snake.LEFT || snake.getMovementSate() == snake.RIGHT) {
 
-                    if (motionEvent.getY() < head.centerY()){
+                    if (motionEvent.getY() < head.centerY()
+                            && board.getRect().contains( (int) motionEvent.getX(),(int) motionEvent.getY() ) ){
                         snake.setMovementState(snake.DOWN);
-                     } else if (motionEvent.getY() > head.centerY()){
+                     } else if (motionEvent.getY() > head.centerY()
+                            && board.getRect().contains( (int) motionEvent.getX(),(int) motionEvent.getY() ) ){
                         snake.setMovementState(snake.UP);
                     }
                 }

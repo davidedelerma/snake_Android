@@ -16,7 +16,7 @@ public class Snake {
 //    private String direction;
     private LinkedList<RectF> body;
     private RectF head, tail;
-    private float X, Y, DX, DY;
+    private float X, Y, DX, DY, width, halfWidth , drawWidth;
     private float snakeSpeed;
     private Paint myPaint;
     public final int STOPPED = 0;
@@ -29,13 +29,17 @@ public class Snake {
     private long timeSinceUpdate;
 
 // initial position instead than rect in the contructor
-    public Snake(float X, float Y){
+    public Snake(float X, float Y , float width){
         this.X = X;
         this.Y = Y;
-        this.DX = 40;
-        this.DY = 40;
-        this.head = new RectF(X-18,Y+18,X+18,Y-18);
-        this.tail = new RectF(X-this.DX-18,Y+18,X-this.DX+18,Y-18);
+        this.width = width;
+        this.width = width;
+        this.DX = this.width;
+        this.DY = this.width;
+        this.halfWidth = this.width/2;
+        this.drawWidth = this.halfWidth-2;
+        this.head = new RectF(X-this.halfWidth,Y+this.halfWidth,X+this.halfWidth,Y-this.halfWidth);
+        this.tail = new RectF(X-this.DX-this.halfWidth,Y+this.halfWidth,X-this.DX+this.halfWidth,Y-this.halfWidth);
         this.body = new LinkedList<>();
         this.body.add(this.tail);
         this.body.add(this.head);
@@ -65,26 +69,29 @@ public class Snake {
                 case RIGHT:
                     this.body.removeFirst();
                     this.X += this.DX;
-                    this.head = new RectF(X - 18, Y + 18, X + 18, Y - 18);
+                    this.head = new RectF(X - drawWidth, Y + drawWidth, X + drawWidth, Y - drawWidth);
                     this.body.add(this.head);
                     break;
                 case LEFT:
                     this.body.removeFirst();
                     this.X -= this.DX;
-                    this.head = new RectF(X - 18, Y + 18, X + 18, Y - 18);
+                    this.head = new RectF(X - drawWidth, Y + drawWidth, X + drawWidth, Y - drawWidth);
                     this.body.add(this.head);
                     break;
                 case UP:
                     this.body.removeFirst();
                     this.Y += this.DY;
-                    this.head = new RectF(X - 18, Y + 18, X + 18, Y - 18);
+                    this.head = new RectF(X - drawWidth, Y + drawWidth, X + drawWidth, Y - drawWidth);
                     this.body.add(this.head);
                     break;
                 case DOWN:
                     this.body.removeFirst();
                     this.Y -= this.DY;
-                    this.head = new RectF(X - 18, Y + 18, X + 18, Y - 18);
+                    this.head = new RectF(X - drawWidth, Y + drawWidth, X + drawWidth, Y - drawWidth);
                     this.body.add(this.head);
+                    break;
+                case STOPPED:
+
                     break;
             }
             this.timeSinceUpdate=System.nanoTime();
@@ -94,32 +101,30 @@ public class Snake {
     public void grow(){
        // long elapsed = (System.nanoTime() - this.timeSinceUpdate) / 1000000;
        // if (elapsed > snakeSpeed) {
+        snakeSpeed -= snakeSpeed * (10/100);
+        switch (snakeMoving){
+            case RIGHT:
+                this.X += this.DX;
+                this.head = new RectF(X - drawWidth, Y + drawWidth, X + drawWidth, Y - drawWidth);
+                this.body.add(this.head);
+                break;
+            case LEFT:
+                this.X -= this.DX;
+                this.head = new RectF(X - drawWidth, Y + drawWidth, X + drawWidth, Y - drawWidth);
+                this.body.add(this.head);
+                break;
+            case UP:
+                this.Y += this.DY;
+                this.head = new RectF(X - drawWidth, Y + drawWidth, X + drawWidth, Y - drawWidth);
+                this.body.add(this.head);
+                break;
+            case DOWN:
+                this.Y -= this.DY;
+                this.head = new RectF(X - drawWidth, Y + drawWidth, X + drawWidth, Y - drawWidth);
+                this.body.add(this.head);
+                break;
+        }
 
-            switch (snakeMoving){
-                case RIGHT:
-                    this.X += this.DX;
-                    this.head = new RectF(X - 18, Y + 18, X + 18, Y - 18);
-                    this.body.add(this.head);
-                    break;
-                case LEFT:
-                    this.X -= this.DX;
-                    this.head = new RectF(X - 18, Y + 18, X + 18, Y - 18);
-                    this.body.add(this.head);
-                    break;
-                case UP:
-                    this.Y += this.DY;
-                    this.head = new RectF(X - 18, Y + 18, X + 18, Y - 18);
-                    this.body.add(this.head);
-                    break;
-                case DOWN:
-                    this.Y -= this.DY;
-                    this.head = new RectF(X - 18, Y + 18, X + 18, Y - 18);
-                    this.body.add(this.head);
-                    break;
-            }
-         //   this.timeSinceUpdate=System.nanoTime();
-       // }
-        this.snakeSpeed-=10;
     }
 
     public void draw(Canvas canvas){
