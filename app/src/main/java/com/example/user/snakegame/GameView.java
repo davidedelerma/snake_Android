@@ -144,6 +144,8 @@ public class GameView extends SurfaceView implements Runnable{
             button.draw(canvas);
             play.draw(canvas);
             paint.setTextSize(50);
+            canvas.drawLine(board.getRect().left, board.getRect().centerY(), board.getRect().right, board.getRect().centerY(), paint);
+            canvas.drawLine(board.getRect().centerX(), board.getRect().top, board.getRect().centerX(), board.getRect().bottom, paint);
             canvas.drawText("Score:" + Integer.toString(user.getScore()), 20, board.getRect().bottom + 60, paint);
             canvas.drawText("Record:"+Integer.toString(record), 20, board.getRect().bottom+110, paint);
             if (!playing){canvas.drawText("GAME OVER", board.getRect().centerX()-150, board.getRect().centerY(), paint);};
@@ -190,19 +192,19 @@ public class GameView extends SurfaceView implements Runnable{
 
                 if (snake.getMovementSate() == snake.UP || snake.getMovementSate() == snake.DOWN) {
 
-                    if (motionEvent.getX() > head.centerX()
+                    if (motionEvent.getX() > board.getRect().centerX()
                             && board.getRect().contains((int) motionEvent.getX(), (int) motionEvent.getY() ) ) {
                         snake.setMovementState(snake.RIGHT);
-                    } else if (motionEvent.getX() < head.centerX()
+                    } else if (motionEvent.getX() < board.getRect().centerX()
                             && board.getRect().contains((int) motionEvent.getX(), (int) motionEvent.getY()) ) {
                         snake.setMovementState(snake.LEFT);
                     }
                 } else if (snake.getMovementSate() == snake.LEFT || snake.getMovementSate() == snake.RIGHT) {
 
-                    if (motionEvent.getY() < head.centerY()
+                    if (motionEvent.getY() < board.getRect().centerY()
                             && board.getRect().contains( (int) motionEvent.getX(),(int) motionEvent.getY() ) ){
                         snake.setMovementState(snake.DOWN);
-                     } else if (motionEvent.getY() > head.centerY()
+                    } else if (motionEvent.getY() > board.getRect().centerY()
                             && board.getRect().contains( (int) motionEvent.getX(),(int) motionEvent.getY() ) ){
                         snake.setMovementState(snake.UP);
                     }
