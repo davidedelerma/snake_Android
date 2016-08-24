@@ -26,10 +26,11 @@ public class Fruit {
         this.maxX = this.rect.right - this.width;
         this.minY = this.rect.top + this.width;
         this.maxY = this.rect.bottom - this.width;
+
         Random rX = new Random();
-        this.X = rX.nextInt((maxX - minX) + 1) + minX;
+        this.X = rX.nextInt(( (maxX - minX) / 40) + 1) *40 + minX;
         Random rY = new Random();
-        this.Y = rY.nextInt((maxY - minY) + 1) + minY;
+        this.Y = rY.nextInt(( (maxY - minY) / 40 ) + 1) *40 + minY;
         this.foodobj = new Rect(this.X-this.drawWidth,this.Y+this.drawWidth,this.X+this.drawWidth,this.Y-this.drawWidth);
 
     }

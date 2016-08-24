@@ -30,6 +30,7 @@ public class GameView extends SurfaceView implements Runnable{
     Fruit fruit;
     User user;
     Button button;
+    PlayButton play;
 
 
     public GameView (Context context, int screenX, int screenY){
@@ -41,8 +42,12 @@ public class GameView extends SurfaceView implements Runnable{
         user = new User();
         paint = new Paint();
         //for bigger devices
-        //if (screenX > 750 && screenY > 800)
-        board = new Board(20, 20, 780, 820);
+        if (screenX > 750 && screenY > 800){
+            board = new Board(20, 20, 780, 820);
+        } else {
+            board = new Board(20, 20, 500, 720);
+        }
+        play = new PlayButton(res, board.getRect().right-240,board.getRect().bottom+20);
         button = new Button(res, board.getRect().right-120,board.getRect().bottom+20);
         fruit = new Fruit(board.getRect(), 40);
         snake = new Snake(40, 40, 40);
@@ -58,6 +63,14 @@ public class GameView extends SurfaceView implements Runnable{
             update();
             draw();
         }
+    }
+
+    public void refreshGame(){
+        Context myContext = this.getContext();
+        Intent newintent = new Intent();
+        newintent.setClass(myContext,SnakeMain.class);
+        myContext.startActivity(newintent);
+
     }
 
     public void update(){
@@ -80,10 +93,7 @@ public class GameView extends SurfaceView implements Runnable{
             if (ourHolder.getSurface().isValid()) {
                 playing = false;
             }
-//            Context myContext = this.getContext();
-//            Intent newintent = new Intent();
-//            newintent.setClass(myContext,GameOverActivity.class);
-//            myContext.startActivity(newintent);
+//
         }
     }
 
@@ -96,8 +106,9 @@ public class GameView extends SurfaceView implements Runnable{
             snake.draw(canvas);
             fruit.draw(canvas);
             button.draw(canvas);
+            play.draw(canvas);
             paint.setTextSize(50);
-            canvas.drawText("score:"+Integer.toString(user.getScore()), 20, board.getRect().bottom+40, paint);
+            canvas.drawText("score:"+Integer.toString(user.getScore()), 20, board.getRect().bottom+60, paint);
             if (!playing){canvas.drawText("GAME OVER", board.getRect().centerX()-150, board.getRect().centerY(), paint);};
             ourHolder.unlockCanvasAndPost(canvas);
         }
@@ -135,13 +146,18 @@ public class GameView extends SurfaceView implements Runnable{
 
                 }
 
+                if (play.getRect().contains((int) motionEvent.getX(),(int) motionEvent.getY())){
+                    refreshGame();
+                }
+
+
                 if (snake.getMovementSate() == snake.UP || snake.getMovementSate() == snake.DOWN) {
 
                     if (motionEvent.getX() > head.centerX()
                             && board.getRect().contains((int) motionEvent.getX(), (int) motionEvent.getY() ) ) {
                         snake.setMovementState(snake.RIGHT);
                     } else if (motionEvent.getX() < head.centerX()
-                            && board.getRect().contains( (int) motionEvent.getX(),(int) motionEvent.getY() ) ) {
+                            && board.getRect().contains((int) motionEvent.getX(), (int) motionEvent.getY()) ) {
                         snake.setMovementState(snake.LEFT);
                     }
                 } else if (snake.getMovementSate() == snake.LEFT || snake.getMovementSate() == snake.RIGHT) {

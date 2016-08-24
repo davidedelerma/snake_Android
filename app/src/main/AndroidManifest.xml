@@ -10,12 +10,14 @@
 
         <activity
             android:name=".SnakeMain"
-            android:label="Codeclan Snake">
+            android:label="Codeclan Snake"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name=".GameOverActivity"
             android:label="@string/game_over"
